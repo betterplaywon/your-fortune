@@ -83,7 +83,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   } catch (err) {
     const mapped = mapError(err);
     const elapsedMs = Date.now() - startedAt;
-    logRequest({ mimeType, byteLength, elapsedMs, code: mapped.code });
+    logRequest({
+      mimeType,
+      byteLength,
+      elapsedMs,
+      code: mapped.code,
+      details: mapped.details,
+    });
     sendError(res, mapped);
   }
 }
@@ -100,16 +106,20 @@ function mapError(err: unknown): AnalyzeError {
   if (err instanceof AnalyzeError) return err;
 
   if (err instanceof Anthropic.RateLimitError) {
-    return new AnalyzeError('RATE_LIMIT');
+    return new AnalyzeError('RATE_LIMIT', undefined, summarizeUpstream(err));
   }
   if (err instanceof Anthropic.APIConnectionError) {
-    return new AnalyzeError('UPSTREAM_ERROR');
+    return new AnalyzeError('UPSTREAM_ERROR', undefined, summarizeUpstream(err));
   }
   if (err instanceof Anthropic.APIError) {
-    if (err.status && err.status >= 500) return new AnalyzeError('UPSTREAM_ERROR');
-    return new AnalyzeError('UPSTREAM_ERROR');
+    return new AnalyzeError('UPSTREAM_ERROR', undefined, summarizeUpstream(err));
   }
-  return new AnalyzeError('INTERNAL_ERROR');
+  return new AnalyzeError('INTERNAL_ERROR', undefined, err instanceof Error ? err.name : 'unknown');
+}
+
+function summarizeUpstream(err: InstanceType<typeof Anthropic.APIError>): string {
+  const status = 'status' in err ? err.status : undefined;
+  return `${err.name}${status ? ` ${status}` : ''}: ${err.message}`;
 }
 
 function logRequest(info: {
@@ -117,8 +127,10 @@ function logRequest(info: {
   byteLength: number;
   elapsedMs: number;
   code: string;
+  details?: string;
 }): void {
+  const detailsPart = info.details ? ` details="${info.details.replace(/"/g, "'")}"` : '';
   console.error(
-    `[analyze] mime=${info.mimeType} bytes=${info.byteLength} ms=${info.elapsedMs} code=${info.code}`,
+    `[analyze] mime=${info.mimeType} bytes=${info.byteLength} ms=${info.elapsedMs} code=${info.code}${detailsPart}`,
   );
 }
