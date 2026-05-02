@@ -13,8 +13,6 @@ export const MAX_IMAGE_DIMENSION = 1024;
 
 export const JPEG_QUALITY = 0.85;
 
-export const MODEL_ID = 'claude-opus-4-7';
-
 export const ANALYSIS_QUERY_KEY = 'analysis';
 
 export const SESSION_STORAGE_PREFIX = 'analysis:';

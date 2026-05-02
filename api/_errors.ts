@@ -45,7 +45,6 @@ export function sendError(res: VercelResponse, err: AnalyzeError): void {
     error: {
       code: err.code,
       message: err.message,
-      ...(err.details ? { details: err.details } : {}),
     },
   };
   res.status(STATUS[err.code]).json(body);

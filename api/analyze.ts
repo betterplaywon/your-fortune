@@ -7,7 +7,7 @@ import { parseAnalysisResult, type AnalysisResult } from './_schema.js';
 import { SYSTEM_PROMPT } from './_systemPrompt.js';
 import { getRequestByteLength, validateAnalyzeRequest } from './_validate.js';
 
-const MODEL_ID = 'claude-opus-4-7';
+const MODEL_ID = 'claude-sonnet-4-5';
 const MAX_TOKENS = 1500;
 
 export const config = { maxDuration: 60 };
