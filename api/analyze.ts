@@ -1,11 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-import { getAnthropicClient } from './_anthropic';
-import { AnalyzeError, sendError } from './_errors';
-import { parseAnalysisResult, type AnalysisResult } from './_schema';
-import { SYSTEM_PROMPT } from './_systemPrompt';
-import { getRequestByteLength, validateAnalyzeRequest } from './_validate';
+import { getAnthropicClient } from './_anthropic.js';
+import { AnalyzeError, sendError } from './_errors.js';
+import { parseAnalysisResult, type AnalysisResult } from './_schema.js';
+import { SYSTEM_PROMPT } from './_systemPrompt.js';
+import { getRequestByteLength, validateAnalyzeRequest } from './_validate.js';
 
 const MODEL_ID = 'claude-opus-4-7';
 const MAX_TOKENS = 1500;

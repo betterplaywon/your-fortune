@@ -1,4 +1,4 @@
-import { AnalyzeError } from './_errors';
+import { AnalyzeError } from './_errors.js';
 
 export type SupportedMimeType = 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif';
 
