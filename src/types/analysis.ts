@@ -9,6 +9,7 @@ export type CategoryResult = {
 
 export type AnalysisResult = {
   overallSummary: string;
+  observations: string[];
   keywords: string[];
   categories: Record<CategoryKey, CategoryResult>;
 };
