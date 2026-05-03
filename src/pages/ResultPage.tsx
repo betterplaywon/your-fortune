@@ -69,7 +69,11 @@ export function ResultPage() {
 
   return (
     <Stack spacing={4} sx={{ pb: 4 }}>
-      <ResultHeader summary={result.overallSummary} keywords={result.keywords} />
+      <ResultHeader
+        summary={result.overallSummary}
+        observations={result.observations}
+        keywords={result.keywords}
+      />
 
       <EthicsNotice variant="block" />
 
