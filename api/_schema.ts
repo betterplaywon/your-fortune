@@ -11,6 +11,7 @@ export type CategoryResult = {
 
 export type AnalysisResult = {
   overallSummary: string;
+  observations: string[];
   keywords: string[];
   categories: Record<CategoryKey, CategoryResult>;
 };
@@ -28,11 +29,8 @@ export function parseAnalysisResult(rawText: string): AnalysisResult {
     throw new AnalyzeError('UPSTREAM_ERROR', '모델 응답에 요약이 없습니다.');
   }
 
-  const keywordsRaw = json.keywords;
-  if (!Array.isArray(keywordsRaw) || keywordsRaw.some((k) => typeof k !== 'string')) {
-    throw new AnalyzeError('UPSTREAM_ERROR', '모델 응답의 키워드 형식이 올바르지 않습니다.');
-  }
-  const keywords = keywordsRaw as string[];
+  const observations = parseStringArray(json.observations, 'observations', { allowMissing: true });
+  const keywords = parseStringArray(json.keywords, 'keywords', { allowMissing: false });
 
   const categoriesRaw = json.categories;
   if (!isPlainObject(categoriesRaw)) {
@@ -44,7 +42,22 @@ export function parseAnalysisResult(rawText: string): AnalysisResult {
     categories[key] = parseCategory(categoriesRaw[key], key);
   }
 
-  return { overallSummary, keywords, categories };
+  return { overallSummary, observations, keywords, categories };
+}
+
+function parseStringArray(
+  value: unknown,
+  fieldName: string,
+  { allowMissing }: { allowMissing: boolean },
+): string[] {
+  if (value === undefined || value === null) {
+    if (allowMissing) return [];
+    throw new AnalyzeError('UPSTREAM_ERROR', `모델 응답의 ${fieldName} 형식이 올바르지 않습니다.`);
+  }
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
+    throw new AnalyzeError('UPSTREAM_ERROR', `모델 응답의 ${fieldName} 형식이 올바르지 않습니다.`);
+  }
+  return value as string[];
 }
 
 function parseCategory(value: unknown, key: CategoryKey): CategoryResult {
